@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Information</title>
+    <style>
+        @keyframes slideUpFadeIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        @keyframes slideDownFadeOut {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            background-color: #000000;
+        }
+
+        #container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .title, .subheading, .byods-title, .purpose-title, .byods-subheading, .purpose-subheading {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            animation: slideUpFadeIn 2s ease-in-out forwards;
+            display: none;
+        }
+
+        .title {
+            top: 45%;
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .subheading {
+            top: 55%;
+            font-size: 1.5em;
+        }
+
+        .byods-title, .purpose-title {
+            top: 40%;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .byods-subheading, .purpose-subheading {
+            top: 55%;
+            font-size: 1.5em;
+        }
+
+        .button-container {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            display: none;
+        }
+
+        .persistent-button-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .button {
+            background-color: transparent;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border: 2px solid white;
+            border-radius: 12px;
+        }
+
+        .button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .arrow-button {
+            position: absolute;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            opacity: 0.5;
+            cursor: pointer;
+            display: none;
+        }
+
+        .arrow-left {
+            left: 20px;
+            border-width: 20px 20px 20px 0;
+            border-color: transparent white transparent transparent;
+        }
+
+        .arrow-right {
+            right: 20px;
+            border-width: 20px 0 20px 20px;
+            border-color: transparent transparent transparent white;
+        }
+
+        .arrow-button:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div class="title" id="title">welcome to 4 teknikal</div>
+    <div class="subheading" id="subheading">have a nice day</div>
+    <div class="button-container" id="button-container">
+        <button class="button" onclick="moveCameraToBYODS()">More Information</button>
+    </div>
+    <div id="byods-title" class="byods-title">What is BYODS?</div>
+    <div id="byods-subheading" class="byods-subheading"> a policy that allows employees in an organization to use their personally owned devices for work-related activities. </div>
+    <div id="purpose-title" class="purpose-title">Purpose of BYODS</div>
+    <div id="purpose-subheading" class="purpose-subheading">to apply digital and interactive learning that is fun based on information technology, creative problem solving, information search as well as building networks and networks, while helping to improve students' PBD mastery. </div>
+    <div class="persistent-button-container">
+        <button class="button" onclick="undo()">Undo</button>
+    </div>
+
+    <div class="arrow-button arrow-left" id="arrow-left" onclick="showBYODS()"></div>
+    <div class="arrow-button arrow-right" id="arrow-right" onclick="showPurpose()"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        const particles = new THREE.BufferGeometry();
+        const particleCount = 1000;
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            positions[i] = Math.random() * 2000 - 1000;
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const particleMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: 0xaaaaaa,
+            emissiveIntensity: 1.5
+        });
+
+        const sphereGeometry = new THREE.SphereGeometry(2, 16, 16);
+        const particleMeshes = [];
+
+        for (let i = 0; i < particleCount; i++) {
+            const particleMesh = new THREE.Mesh(sphereGeometry, particleMaterial);
+            particleMesh.position.set(
+                positions[i * 3],
+                positions[i * 3 + 1],
+                positions[i * 3 + 2]
+            );
+            scene.add(particleMesh);
+            particleMeshes.push(particleMesh);
+        }
+
+        camera.position.z = 500;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Touch event listeners
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+
+        let initialTouchX = 0;
+        let initialTouchY = 0;
+
+        function handleTouchStart(event) {
+            const touch = event.touches[0];
+            initialTouchX = touch.clientX;
+            initialTouchY = touch.clientY;
+        }
+
+        function handleTouchMove(event) {
+            if (event.touches.length > 1) return;
+
+            const touch = event.touches[0];
+            mouseX = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(touch.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            TWEEN.update();
+
+            particleMeshes.forEach(mesh => {
+                mesh.rotation.x += 0.001;
+                mesh.rotation.y += 0.001;
+            });
+
+            targetX = mouseX * 0.05;
+            targetY = mouseY * 0.05;
+            scene.rotation.x += (targetY - scene.rotation.x) * 0.05;
+            scene.rotation.y += (targetX - scene.rotation.y) * 0.05;
+            scene.rotation.x += 0.001;
+            scene.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function moveCameraToBYODS() {
+            // Animate camera position to BYODS section
+            new TWEEN.Tween(camera.position)
+                .to({ z: 200 }, 1000)
+                .easing(TWEEN.Easing.Cubic.InOut)
+                .start();
+            
+            showBYODS();
+        }
+
+        function moveCameraToMain() {
+            // Animate camera position back to main section
+            new TWEEN.Tween(camera.position)
+                .to({ z: 500 }, 1000)
+                .easing(TWEEN.Easing.Cubic.InOut)
+                .start();
+
+            showMain();
+        }
+
+        function showBYODS() {
+            hideAllSections();
+            setTimeout(() => {
+                document.getElementById('byods-title').style.display = 'block';
+                document.getElementById('byods-subheading').style.display = 'block';
+                document.getElementById('arrow-left').style.display = 'block';
+                document.getElementById('arrow-right').style.display = 'block';
+
+                document.getElementById('byods-title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+                document.getElementById('byods-subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            }, 2000);
+        }
+
+        function showPurpose() {
+            hideAllSections();
+            setTimeout(() => {
+                document.getElementById('purpose-title').style.display = 'block';
+                document.getElementById('purpose-subheading').style.display = 'block';
+                document.getElementById('arrow-left').style.display = 'block';
+                document.getElementById('arrow-right').style.display = 'block';
+
+                document.getElementById('purpose-title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+                document.getElementById('purpose-subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            }, 2000);
+        }
+
+        function undo() {
+            if (document.getElementById('byods-title').style.display === 'block') {
+                moveCameraToMain();
+            } else if (document.getElementById('purpose-title').style.display === 'block') {
+                showBYODS();
+            }
+        }
+
+        function showMain() {
+            hideAllSections();
+            setTimeout(() => {
+                document.getElementById('title').style.display = 'block';
+                document.getElementById('subheading').style.display = 'block';
+                document.getElementById('button-container').style.display = 'block';
+
+                document.getElementById('title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+                document.getElementById('subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+                document.getElementById('button-container').style.opacity = '1';
+            }, 2000);
+        }
+
+        function hideAllSections() {
+            document.getElementById('title').style.display = 'none';
+            document.getElementById('subheading').style.display = 'none';
+            document.getElementById('button-container').style.display = 'none';
+            document.getElementById('byods-title').style.display = 'none';
+            document.getElementById('byods-subheading').style.display = 'none';
+            document.getElementById('purpose-title').style.display = 'none';
+            document.getElementById('purpose-subheading').style.display = 'none';
+            document.getElementById('arrow-left').style.display = 'none';
+            document.getElementById('arrow-right').style.display = 'none';
+        }
+
+        showMain();
+    </script>
+</body>
+</html>
+

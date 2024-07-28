@@ -143,15 +143,15 @@
 </head>
 <body>
     <div id="container"></div>
-    <div class="title" id="title">welcome to 4 teknikal</div>
-    <div class="subheading" id="subheading">have a nice day</div>
+    <div class="title" id="title">Welcome to 4 Teknika</div>
+    <div class="subheading" id="subheading">Have a Nice Day</div>
     <div class="button-container" id="button-container">
         <button class="button" onclick="moveCameraToBYODS()">More Information</button>
     </div>
     <div id="byods-title" class="byods-title">What is BYODS?</div>
-    <div id="byods-subheading" class="byods-subheading"> a policy that allows employees in an organization to use their personally owned devices for work-related activities. </div>
+    <div id="byods-subheading" class="byods-subheading">A policy that allows employees in an organization to use their personally owned devices for work-related activities.</div>
     <div id="purpose-title" class="purpose-title">Purpose of BYODS</div>
-    <div id="purpose-subheading" class="purpose-subheading">to apply digital and interactive learning that is fun based on information technology, creative problem solving, information search as well as building networks and networks, while helping to improve students' PBD mastery. </div>
+    <div id="purpose-subheading" class="purpose-subheading">To apply digital and interactive learning that is fun based on information technology, creative problem solving, information search as well as building networks and networks, while helping to improve students' PBD mastery.</div>
     <div class="persistent-button-container">
         <button class="button" onclick="undo()">Undo</button>
     </div>
@@ -178,25 +178,14 @@
 
         particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-        const particleMaterial = new THREE.MeshStandardMaterial({
+        const particleMaterial = new THREE.PointsMaterial({
             color: 0xffffff,
-            emissive: 0xaaaaaa,
-            emissiveIntensity: 1.5
+            size: 2,
+            sizeAttenuation: true
         });
 
-        const sphereGeometry = new THREE.SphereGeometry(2, 16, 16);
-        const particleMeshes = [];
-
-        for (let i = 0; i < particleCount; i++) {
-            const particleMesh = new THREE.Mesh(sphereGeometry, particleMaterial);
-            particleMesh.position.set(
-                positions[i * 3],
-                positions[i * 3 + 1],
-                positions[i * 3 + 2]
-            );
-            scene.add(particleMesh);
-            particleMeshes.push(particleMesh);
-        }
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        scene.add(particleSystem);
 
         camera.position.z = 500;
 
@@ -235,17 +224,13 @@
             requestAnimationFrame(animate);
             TWEEN.update();
 
-            particleMeshes.forEach(mesh => {
-                mesh.rotation.x += 0.001;
-                mesh.rotation.y += 0.001;
-            });
+            particleSystem.rotation.x += 0.001;
+            particleSystem.rotation.y += 0.001;
 
             targetX = mouseX * 0.05;
             targetY = mouseY * 0.05;
             scene.rotation.x += (targetY - scene.rotation.x) * 0.05;
             scene.rotation.y += (targetX - scene.rotation.y) * 0.05;
-            scene.rotation.x += 0.001;
-            scene.rotation.y += 0.001;
 
             renderer.render(scene, camera);
         }
@@ -258,84 +243,82 @@
         });
 
         function moveCameraToBYODS() {
-            // Animate camera position to BYODS section
-            new TWEEN.Tween(camera.position)
-                .to({ z: 200 }, 1000)
-                .easing(TWEEN.Easing.Cubic.InOut)
-                .start();
-            
-            showBYODS();
+            hideAllSections(() => {
+                new TWEEN.Tween(camera.position)
+                    .to({ z: 200 }, 1000)
+                    .easing(TWEEN.Easing.Cubic.InOut)
+                    .start();
+
+                setTimeout(showBYODS, 1000);
+            });
         }
 
         function moveCameraToMain() {
-            // Animate camera position back to main section
-            new TWEEN.Tween(camera.position)
-                .to({ z: 500 }, 1000)
-                .easing(TWEEN.Easing.Cubic.InOut)
-                .start();
+            hideAllSections(() => {
+                new TWEEN.Tween(camera.position)
+                    .to({ z: 500 }, 1000)
+                    .easing(TWEEN.Easing.Cubic.InOut)
+                    .start();
 
-            showMain();
+                setTimeout(showMain, 1000);
+            });
         }
 
         function showBYODS() {
-            hideAllSections();
-            setTimeout(() => {
-                document.getElementById('byods-title').style.display = 'block';
-                document.getElementById('byods-subheading').style.display = 'block';
-                document.getElementById('arrow-left').style.display = 'block';
-                document.getElementById('arrow-right').style.display = 'block';
-
-                document.getElementById('byods-title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-                document.getElementById('byods-subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-            }, 2000);
+            document.getElementById('byods-title').style.display = 'block';
+            document.getElementById('byods-subheading').style.display = 'block';
+            document.getElementById('arrow-left').style.display = 'block';
+            document.getElementById('arrow-right').style.display = 'block';
+            document.querySelectorAll('#byods-title, #byods-subheading').forEach(el => {
+                el.style.opacity = 1;
+                el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            });
         }
 
         function showPurpose() {
-            hideAllSections();
-            setTimeout(() => {
+            hideAllSections(() => {
                 document.getElementById('purpose-title').style.display = 'block';
                 document.getElementById('purpose-subheading').style.display = 'block';
                 document.getElementById('arrow-left').style.display = 'block';
                 document.getElementById('arrow-right').style.display = 'block';
-
-                document.getElementById('purpose-title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-                document.getElementById('purpose-subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-            }, 2000);
-        }
-
-        function undo() {
-            if (document.getElementById('byods-title').style.display === 'block') {
-                moveCameraToMain();
-            } else if (document.getElementById('purpose-title').style.display === 'block') {
-                showBYODS();
-            }
+                document.querySelectorAll('#purpose-title, #purpose-subheading').forEach(el => {
+                    el.style.opacity = 1;
+                    el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+                });
+            });
         }
 
         function showMain() {
-            hideAllSections();
-            setTimeout(() => {
-                document.getElementById('title').style.display = 'block';
-                document.getElementById('subheading').style.display = 'block';
-                document.getElementById('button-container').style.display = 'block';
-
-                document.getElementById('title').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-                document.getElementById('subheading').style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-                document.getElementById('button-container').style.opacity = '1';
-            }, 2000);
+            document.getElementById('title').style.display = 'block';
+            document.getElementById('subheading').style.display = 'block';
+            document.getElementById('button-container').style.display = 'block';
+            document.querySelectorAll('#title, #subheading, #button-container').forEach(el => {
+                el.style.opacity = 1;
+                el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            });
         }
 
-        function hideAllSections() {
-            document.getElementById('title').style.display = 'none';
-            document.getElementById('subheading').style.display = 'none';
-            document.getElementById('button-container').style.display = 'none';
-            document.getElementById('byods-title').style.display = 'none';
-            document.getElementById('byods-subheading').style.display = 'none';
-            document.getElementById('purpose-title').style.display = 'none';
-            document.getElementById('purpose-subheading').style.display = 'none';
+        function undo() {
+            moveCameraToMain();
+        }
+
+        function hideAllSections(callback) {
+            const elements = document.querySelectorAll('.title, .subheading, .byods-title, .purpose-title, .byods-subheading, .purpose-subheading, .button-container');
+            let count = elements.length;
+            elements.forEach(el => {
+                el.style.animation = 'slideDownFadeOut 2s ease-in-out forwards';
+                setTimeout(() => {
+                    el.style.display = 'none';
+                    count--;
+                    if (count === 0 && callback) callback();
+                }, 2000);
+            });
+
             document.getElementById('arrow-left').style.display = 'none';
             document.getElementById('arrow-right').style.display = 'none';
         }
 
+        // Initial display of the main page
         showMain();
     </script>
 </body>

@@ -3,28 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Information</title>
+    <title>4 Teknikal</title>
     <style>
-        @keyframes slideUpFadeIn {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, 20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        @keyframes slideDownFadeOut {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, 20px);
-            }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
 
         body {
@@ -43,37 +31,27 @@
             height: 100%;
         }
 
-        .title, .subheading, .byods-title, .purpose-title, .byods-subheading, .purpose-subheading {
+        .text-container {
             position: absolute;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             text-align: center;
             z-index: 10;
-            opacity: 0;
-            animation: slideUpFadeIn 2s ease-in-out forwards;
-            display: none;
         }
 
         .title {
-            top: 45%;
             font-size: 3em;
             font-weight: bold;
         }
 
-        .subheading {
-            top: 55%;
+        .subheading, .byods-subheading, .purpose-subheading {
             font-size: 1.5em;
         }
 
         .byods-title, .purpose-title {
-            top: 40%;
             font-size: 2.5em;
             font-weight: bold;
-        }
-
-        .byods-subheading, .purpose-subheading {
-            top: 55%;
-            font-size: 1.5em;
         }
 
         .button-container {
@@ -82,9 +60,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            display: none;
         }
 
         .persistent-button-container {
@@ -121,7 +96,6 @@
             border-style: solid;
             opacity: 0.5;
             cursor: pointer;
-            display: none;
         }
 
         .arrow-left {
@@ -139,25 +113,69 @@
         .arrow-button:hover {
             opacity: 1;
         }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+
+            .subheading, .byods-subheading, .purpose-subheading {
+                font-size: 1em;
+            }
+
+            .byods-title, .purpose-title {
+                font-size: 1.5em;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5em;
+            }
+
+            .subheading, .byods-subheading, .purpose-subheading {
+                font-size: 0.8em;
+            }
+
+            .byods-title, .purpose-title {
+                font-size: 1.2em;
+            }
+
+            .button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="container"></div>
-    <div class="title" id="title">welcome to 4 teknikal</div>
-    <div class="subheading" id="subheading">have a nice day</div>
-    <div class="button-container" id="button-container">
-        <button class="button" onclick="moveCameraToBYODS()">More Information</button>
+    <div class="text-container" id="main-text">
+        <div class="title" id="title">Welcome to 4 Teknikal</div>
+        <div class="subheading" id="subheading">4 Teknikal is one of the class that has be choosen to participate in BYODS Program</div>
     </div>
-    <div id="byods-title" class="byods-title">What is BYODS?</div>
-    <div id="byods-subheading" class="byods-subheading">A policy that allows employees in an organization to use their personally owned devices for work-related activities.</div>
-    <div id="purpose-title" class="purpose-title">Purpose of BYODS</div>
-    <div id="purpose-subheading" class="purpose-subheading">To apply digital and interactive learning that is fun based on information technology, creative problem solving, information search as well as building networks and networks, while helping to improve students' PBD mastery.</div>
+    <div class="button-container" id="button-container">
+        <button class="button" onclick="moveCameraToBYODS()">more info</button>
+    </div>
+    <div class="text-container" id="byods-text">
+        <div class="byods-title" id="byods-title">What is BYODS?</div>
+        <div class="byods-subheading" id="byods-subheading">␁ a policy that allows students in school to use their personally owned devices for studies-related activities.</div>
+    </div>
+    <div class="text-container" id="purpose-text">
+        <div class="purpose-title" id="purpose-title">Purpose of BYODS</div>
+        <div class="purpose-subheading" id="purpose-subheading">To apply digital and interactive learning that is fun based on information technology, creative problem solving, information search as well as building networks and networks, while helping to improve student's PBD mastery.</div>
+    </div>
     <div class="persistent-button-container">
         <button class="button" onclick="undo()">Undo</button>
     </div>
 
-    <div class="arrow-button arrow-left" id="arrow-left" onclick="showBYODS()"></div>
-    <div class="arrow-button arrow-right" id="arrow-right" onclick="showPurpose()"></div>
+    <div class="arrow-button arrow-left" id="arrow-left" onclick="cycleLeft()"></div>
+    <div class="arrow-button arrow-right" id="arrow-right" onclick="cycleRight()"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
@@ -229,49 +247,50 @@
 
             targetX = mouseX * 0.05;
             targetY = mouseY * 0.05;
-            scene.rotation.x += (targetY - scene.rotation.x) * 0.05;
-            scene.rotation.y += (targetX - scene.rotation.y) * 0.05;
+            scene.rotation.x += (targetY - scene.rotation.x) * 0.1;
+            scene.rotation.y += (targetX - scene.rotation.y) * 0.1;
 
             renderer.render(scene, camera);
         }
+
         animate();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
         function moveCameraToBYODS() {
-            hideAllSections(() => {
-                new TWEEN.Tween(camera.position)
-                    .to({ z: 200 }, 1000)
-                    .easing(TWEEN.Easing.Cubic.InOut)
-                    .start();
-
-                setTimeout(showBYODS, 1000);
-            });
+            const from = { z: camera.position.z };
+            const to = { z: 100 };
+            const tween = new TWEEN.Tween(from)
+                .to(to, 2000)
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .onUpdate(() => {
+                    camera.position.z = from.z;
+                })
+                .onComplete(showBYODS)
+                .start();
         }
 
         function moveCameraToMain() {
-            hideAllSections(() => {
-                new TWEEN.Tween(camera.position)
-                    .to({ z: 500 }, 1000)
-                    .easing(TWEEN.Easing.Cubic.InOut)
-                    .start();
-
-                setTimeout(showMain, 1000);
-            });
+            const from = { z: camera.position.z };
+            const to = { z: 500 };
+            const tween = new TWEEN.Tween(from)
+                .to(to, 2000)
+                .easing(TWEEN.Easing.Quadratic.InOut)
+                .onUpdate(() => {
+                    camera.position.z = from.z;
+                })
+                .onComplete(showMain)
+                .start();
         }
 
         function showBYODS() {
-            document.getElementById('byods-title').style.display = 'block';
-            document.getElementById('byods-subheading').style.display = 'block';
-            document.getElementById('arrow-left').style.display = 'block';
-            document.getElementById('arrow-right').style.display = 'block';
-            document.querySelectorAll('#byods-title, #byods-subheading').forEach(el => {
-                el.style.opacity = 1;
-                el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            hideAllSections(() => {
+                document.getElementById('byods-title').style.display = 'block';
+                document.getElementById('byods-subheading').style.display = 'block';
+                document.getElementById('arrow-left').style.display = 'block';
+                document.getElementById('arrow-right').style.display = 'block';
+                fadeInElement('byods-title');
+                fadeInElement('byods-subheading');
+                fadeInElement('arrow-left');
+                fadeInElement('arrow-right');
             });
         }
 
@@ -281,46 +300,64 @@
                 document.getElementById('purpose-subheading').style.display = 'block';
                 document.getElementById('arrow-left').style.display = 'block';
                 document.getElementById('arrow-right').style.display = 'block';
-                document.querySelectorAll('#purpose-title, #purpose-subheading').forEach(el => {
-                    el.style.opacity = 1;
-                    el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
-                });
+                fadeInElement('purpose-title');
+                fadeInElement('purpose-subheading');
+                fadeInElement('arrow-left');
+                fadeInElement('arrow-right');
             });
         }
 
         function showMain() {
-            document.getElementById('title').style.display = 'block';
-            document.getElementById('subheading').style.display = 'block';
-            document.getElementById('button-container').style.display = 'block';
-            document.querySelectorAll('#title, #subheading, #button-container').forEach(el => {
-                el.style.opacity = 1;
-                el.style.animation = 'slideUpFadeIn 2s ease-in-out forwards';
+            hideAllSections(() => {
+                document.getElementById('title').style.display = 'block';
+                document.getElementById('subheading').style.display = 'block';
+                document.getElementById('button-container').style.display = 'block';
+                fadeInElement('title');
+                fadeInElement('subheading');
+                fadeInElement('button-container');
             });
+        }
+
+        function hideAllSections(callback) {
+            const elements = document.querySelectorAll('.title, .subheading, .byods-title, .purpose-title, .byods-subheading, .purpose-subheading, .button-container, .arrow-button');
+            elements.forEach((element) => {
+                element.style.display = 'none';
+            });
+            if (callback) callback();
+        }
+
+        function fadeInElement(id) {
+            const element = document.getElementById(id);
+            element.style.opacity = '0';
+            element.style.display = 'block';
+            element.style.animation = 'fadeIn 2s ease-in-out forwards';
+        }
+
+        let isBYODSPage = true;
+
+        function cycleLeft() {
+            if (isBYODSPage) {
+                showPurpose();
+            } else {
+                showBYODS();
+            }
+            isBYODSPage = !isBYODSPage;
+        }
+
+        function cycleRight() {
+            if (isBYODSPage) {
+                showPurpose();
+            } else {
+                showBYODS();
+            }
+            isBYODSPage = !isBYODSPage;
         }
 
         function undo() {
             moveCameraToMain();
         }
 
-        function hideAllSections(callback) {
-            const elements = document.querySelectorAll('.title, .subheading, .byods-title, .purpose-title, .byods-subheading, .purpose-subheading, .button-container');
-            let count = elements.length;
-            elements.forEach(el => {
-                el.style.animation = 'slideDownFadeOut 2s ease-in-out forwards';
-                setTimeout(() => {
-                    el.style.display = 'none';
-                    count--;
-                    if (count === 0 && callback) callback();
-                }, 2000);
-            });
-
-            document.getElementById('arrow-left').style.display = 'none';
-            document.getElementById('arrow-right').style.display = 'none';
-        }
-
-        // Initial display of the main page
         showMain();
     </script>
 </body>
 </html>
-
